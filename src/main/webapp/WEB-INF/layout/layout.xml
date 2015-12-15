@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+    <definition name="base" template="/WEB-INF/layout/page.jsp">
+        <put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
+    </definition>
+
+    <definition name="home" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/home.jsp" />
+    </definition>
+
+    <definition name="registerForm" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/registerForm.jsp" />
+    </definition>
+
+    <definition name="login" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/login.jsp" />
+    </definition>
+
+    <definition name="adm_servers" extends="base">
+        <put-attribute name="body" value="/WEB-INF/adm/adm_servers.jsp" />
+    </definition>
+
+    <definition name="adm_users" extends="base">
+        <put-attribute name="body" value="/WEB-INF/adm/adm_users.jsp" />
+    </definition>
+
+    <definition name="adm_user" extends="base">
+        <put-attribute name="body" value="/WEB-INF/adm/adm_user.jsp" />
+    </definition>
+
+    <definition name="adm_server_credentials" extends="base">
+        <put-attribute name="body" value="/WEB-INF/adm/adm_server_credentials.jsp" />
+    </definition>
+
+    <definition name="adm_server_form" extends="base">
+        <put-attribute name="body" value="/WEB-INF/adm/adm_server_form.jsp" />
+    </definition>
+
+    <definition name="adm_server" extends="base">
+        <put-attribute name="body" value="/WEB-INF/adm/adm_server.jsp" />
+    </definition>
+
+    <definition name="admin" extends="base">
+        <put-attribute name="body" value="/WEB-INF/adm/admin.jsp" />
+    </definition>
+
+    <definition name="profile" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/profile.jsp" />
+    </definition>
+
+    <definition name="servers" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/servers.jsp" />
+    </definition>
+
+    <definition name="server" extends="base">
+        <put-attribute name="body" value="/WEB-INF/views/server.jsp" />
+    </definition>
+
+</tiles-definitions>

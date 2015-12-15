@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SonarQubeConfiguration">
+    <option name="moduleKeys">
+      <map>
+        <entry key="server-reservation" value="pl.san.jakub:server-reservation" />
+      </map>
+    </option>
+    <option name="projectKey" value="pl.san.jakub:server-reservation" />
+    <option name="serverId" value="192.168.0.150" />
+  </component>
+</project>

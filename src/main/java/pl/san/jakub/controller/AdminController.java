@@ -1,0 +1,182 @@
+package pl.san.jakub.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import pl.san.jakub.model.AuthoritiesAccess;
+import pl.san.jakub.model.CredentialsAccess;
+import pl.san.jakub.model.ServersAccess;
+import pl.san.jakub.model.UsersAccess;
+import pl.san.jakub.model.data.Credentials;
+import pl.san.jakub.model.data.Servers;
+import pl.san.jakub.model.data.Users;
+import pl.san.jakub.tools.exceptions.ServerCreationException;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+/**
+ * Created by Jakub on 14.11.2015.
+ */
+
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
+
+    private ServersAccess serversAccess;
+    private CredentialsAccess credentialsAccess;
+    private UsersAccess usersAccess;
+    private AuthoritiesAccess authoritiesAccess;
+
+    @Autowired
+    public AdminController(ServersAccess serversAccess, CredentialsAccess credentialsAccess,
+                           UsersAccess usersAccess, AuthoritiesAccess authoritiesAccess) {
+        this.serversAccess = serversAccess;
+        this.credentialsAccess = credentialsAccess;
+        this.usersAccess = usersAccess;
+        this.authoritiesAccess = authoritiesAccess;
+    }
+
+    @RequestMapping(method = GET)
+    public String getAdminHome() {
+
+        return "admin";
+    }
+
+    @RequestMapping(value = "/users", method = GET)
+    public String usersList(Model model) {
+
+        model.addAttribute("users", usersAccess.findAll());
+
+        return "adm_users";
+    }
+
+    @RequestMapping(value = "/users", method = POST)
+    public String editUser(RegisterForm registerForm, Model model) {
+        Users users = usersAccess.findByUsername(registerForm.getUsername());
+
+        String firstname = registerForm.getFirstName();
+        String lastName = registerForm.getLastName();
+        String password = registerForm.getPassword();
+        boolean isEnabled = registerForm.isEnabled();
+
+        if(isNotBlank(firstname)) {
+            users.setFirstName(firstname);
+        }
+        if(isNotBlank(lastName)) {
+            users.setLastName(lastName);
+        }
+        if(isNotBlank(password)) {
+            users.setPassword(password);
+        }
+        users.setEnabled(isEnabled);
+
+        usersAccess.save(users);
+        model.addAttribute("msg", "Successfully changed user " + users.getUsername() + " account details.");
+
+        return "redirect:/admin/users/"+users.getUsername();
+
+    }
+
+    @RequestMapping(value = "/removeUser", method = POST)
+    public String removeUser(RegisterForm registerForm, Model model) {
+        Users user = usersAccess.findByUsername(registerForm.getUsername());
+
+        if(user == null || user.getHost_names().size() != 0) {
+            model.addAttribute("error", "User is not removed!");
+            return "redirect:/admin/users";
+        }
+        usersAccess.delete(user.getUsername());
+        authoritiesAccess.remove(user.getUsername());
+
+        model.addAttribute("msg", "Successfully removed user "+user.getUsername() + ".");
+        return "redirect:/admin/users";
+    }
+
+    @RequestMapping(value = "/removeServer", method = POST)
+    public String removeServer(ServerForm form, Model model) {
+        Servers server = serversAccess.findOne(form.getHost_name());
+
+        if(null == server) {
+            model.addAttribute("error", "Server is not removed!");
+            return "adm_servers";
+        }
+        removeReservations(server);
+        serversAccess.delete(server.getHost_name());
+        credentialsAccess.delete(server.getIrmc_ip());
+        credentialsAccess.delete(server.getOs_ip());
+        model.addAttribute("msg", "Successfully removed server "+server.getHost_name() + ".");
+        return "redirect:/admin/servers";
+    }
+
+    private void removeReservations(Servers server) {
+        Users user = server.getUser();
+        if(user != null){
+            server.setUser(null);
+            user.removeHostname(server);
+            usersAccess.save(user);
+        }
+    }
+
+    @RequestMapping(value = "/servers", method = GET)
+    public String serversList(Model model) {
+        model.addAttribute("servers", serversAccess.findAll());
+        return "adm_servers";
+    }
+
+    @RequestMapping(value = "/users/{username}", method = GET)
+    public String userEditForm(@PathVariable("username") String username, Model model) {
+        model.addAttribute("user",usersAccess.findByUsername(username));
+        return "adm_user";
+    }
+
+    @RequestMapping(value = "/servers/{ip}/credentials", method = GET)
+    public String serversCredentials(@PathVariable("ip") String ip, Model model) {
+        model.addAttribute("credentials", credentialsAccess.findByIp(ip));
+        return "adm_server_credentials";
+    }
+
+    @RequestMapping(value = "/addserver", method = GET)
+    public String showServerRegistration() {
+        return "adm_server_form";
+    }
+
+    @RequestMapping(value = "/addserver", method = POST)
+    public String processServerRegistration(ServerForm serverForm, Model model) {
+        try {
+            Credentials credentialsIRMC = serverForm.getCredentialsIrmc();
+            Credentials credentialsOS = serverForm.getCredentialsOS();
+            Servers servers = serverForm.getServer();
+
+            serversAccess.save(servers, credentialsOS, credentialsIRMC);
+            return "redirect:/admin/servers/"+servers.getHost_name();
+        } catch (ServerCreationException e) {
+            model.addAttribute("error", "Server creation failed. Attributes can't be empty!");
+            return "adm_server_form";
+        }
+    }
+
+    @RequestMapping(value = "/servers/{hostName}", method = RequestMethod.GET)
+    public String server(@PathVariable("hostName") String hostName, Model model) {
+        Servers servers = serversAccess.findOne(hostName);
+        Credentials credentialsIrmc = credentialsAccess.findByIp(servers.getIrmc_ip());
+        Credentials credentialsOS = credentialsAccess.findByIp(servers.getOs_ip());
+        model.addAttribute(servers);
+        model.addAttribute("credentialsIrmc", credentialsIrmc);
+        model.addAttribute("credentialsOS", credentialsOS);
+
+        return "adm_server";
+    }
+
+    @RequestMapping(value = "/servers/restoredefaultcredentials", method = POST)
+    public String restoreDefaultCredentials(ServerForm serverForm) {
+
+        return "";
+    }
+
+
+}
