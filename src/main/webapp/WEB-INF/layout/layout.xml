@@ -5,60 +5,80 @@
 <tiles-definitions>
 
     <definition name="base" template="/WEB-INF/layout/page.jsp">
-        <put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
         <put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
+        <!---->
+        <put-attribute name="title" value="Server reservation" />
+        <put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
     </definition>
 
     <definition name="home" extends="base">
         <put-attribute name="body" value="/WEB-INF/views/home.jsp" />
+        
+        <put-attribute name="title" value="Server reservation - home page" />
     </definition>
 
     <definition name="registerForm" extends="base">
         <put-attribute name="body" value="/WEB-INF/views/registerForm.jsp" />
+        
+        <put-attribute name="title" value="Registration" />
     </definition>
 
     <definition name="login" extends="base">
         <put-attribute name="body" value="/WEB-INF/views/login.jsp" />
+        
+        <put-attribute name="title" value="Server reservation - login" />
     </definition>
 
     <definition name="adm_servers" extends="base">
         <put-attribute name="body" value="/WEB-INF/adm/adm_servers.jsp" />
+        
+        <put-attribute name="title" value="Admin - Servers list" />
     </definition>
 
     <definition name="adm_users" extends="base">
         <put-attribute name="body" value="/WEB-INF/adm/adm_users.jsp" />
+        
+        <put-attribute name="title" value="Admin - users list" />
     </definition>
 
     <definition name="adm_user" extends="base">
         <put-attribute name="body" value="/WEB-INF/adm/adm_user.jsp" />
+        <put-attribute name="title" value="Admin - user view" />
     </definition>
 
     <definition name="adm_server_credentials" extends="base">
         <put-attribute name="body" value="/WEB-INF/adm/adm_server_credentials.jsp" />
+        <put-attribute name="title" value="Admin - server details" />
     </definition>
 
     <definition name="adm_server_form" extends="base">
         <put-attribute name="body" value="/WEB-INF/adm/adm_server_form.jsp" />
+        <put-attribute name="title" value="Admin - add server" />
     </definition>
 
     <definition name="adm_server" extends="base">
         <put-attribute name="body" value="/WEB-INF/adm/adm_server.jsp" />
+        <put-attribute name="title" value="Admin - server details" />
     </definition>
 
     <definition name="admin" extends="base">
         <put-attribute name="body" value="/WEB-INF/adm/admin.jsp" />
+        <put-attribute name="title" value="Admin - home page" />
     </definition>
 
     <definition name="profile" extends="base">
         <put-attribute name="body" value="/WEB-INF/views/profile.jsp" />
+        <put-attribute name="title" value="Server reservation - user profile" />
     </definition>
 
     <definition name="servers" extends="base">
         <put-attribute name="body" value="/WEB-INF/views/servers.jsp" />
+        <put-attribute name="title" value="Servers list" />
     </definition>
 
     <definition name="server" extends="base">
         <put-attribute name="body" value="/WEB-INF/views/server.jsp" />
+        <put-attribute name="title" value="Server details" />
     </definition>
 
 </tiles-definitions>

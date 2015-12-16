@@ -3,45 +3,35 @@
 <%@ page session="false" contentType="text/html; charset=UTF-8" %>
 <html>
 <head>
-    <title>Server reservation</title>
+    <title><t:getAsString name="title"/></title>
     <link rel="stylesheet"
           type="text/css"
           href="/resources/css/bootstrap.css" >
     <script src="http://code.jquery.com/jquery-latest.min.js"
             type="text/javascript"></script>
-
     <script src="/resources/validator.min.js"
             type="text/javascript"></script>
-    <script>
-        $(document).ready(function () {
-            $('.nav li a').click(function(e) {
-
-                $('.nav li').removeClass('active');
-
-                var $parent = $(this).parent();
-                if (!$parent.hasClass('active')) {
-                    $parent.addClass('active');
-                }
-//                e.preventDefault();
-            });
-        });
-        $(document).ready(function () {
-            $('.sidebar li a').click(function(e) {
-
-                $('.nav li').removeClass('active');
-
-                var $parent = $(this).parent();
-                if (!$parent.hasClass('active')) {
-                    $parent.addClass('active');
-                }
-//                e.preventDefault();
-            });
-        });
-    </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="/resources/purl.js"
             type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var matchers = [/login/,/admin\/servers/,/home/,/register/,/admin\/users/,/admin\/addserver/];
+            var x = window.location.href;
+            var res = '';
+            for(var i = 0; i < matchers.length; i++) {
+                if(x.match(matchers[i])) {
+                    res = x.match(matchers[i]);
+                    res = '#'+res;
+                    break;
+                }
+            }
+            $(res).addClass("active");
+
+//            document.getElementById(res).classList.add('active');
+        });
+
+    </script>
     <style>
         .footer {
             position: fixed;
@@ -108,7 +98,6 @@
             padding-left: 20px;
             color: #1D4152;
         }
-
     </style>
 </head>
 <body>
