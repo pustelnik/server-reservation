@@ -2,9 +2,19 @@ package pl.san.jakub.tools;
 
 /**
  * Created by Jakub on 19.12.2015.
+ *
+ * Error codes from Microsoft websites:
+ * https://msdn.microsoft.com/en-us/library/windows/desktop/aa370674(v=vs.85).aspx
+ * https://msdn.microsoft.com/en-us/library/windows/desktop/ms681385(v=vs.85).aspx
+ *
  */
 public enum NetApiError {
 
+    EXIT_CODE_SUCCESS("The operation completed successfully.",0),
+    EXIT_CODE_INCORECT_PARAMETER("The parameter is incorrect.", 87),
+    EXIT_CODE_INCORECT_NETWORK_PASS("The specified network password is not correct.", 86),
+    ERROR_PASSWORD_RESTRICTION("Unable to update the password. The value provided for the new password does not meet the length, complexity, or history requirements of the domain.",1325),
+    ERROR_CANT_ACCESS_DOMAIN_INFO("Configuration information could not be read from the domain controller, either because the machine is unavailable, or access has been denied.", 1351),
     NERR_NetNotStarted("The workstation driver is not installed.",2102),
     NERR_UnknownServer("The server could not be located.",2103),
     NERR_ShareMem("An internal error occurred. The network cannot access a shared memory segment.",2104),
@@ -324,11 +334,17 @@ public enum NetApiError {
     NERR_CantVerifyHostname("Could not verify the current machine's hostname against the saved value in the join completion information.",2716),
     NERR_CantLoadOfflineHive("Unable to load the specified offline registry hive. Please ensure you have access to the specified path location and permissions to modify its contents. Running as an elevated administrator may be required.",2717),
     NERR_ConnectionInsecure("The minimum session security requirements for this operation were not met.",2718),
-    NERR_ProvisioningBlobUnsupported("Computer account provisioning blob version is not supported.",2719);
+    NERR_ProvisioningBlobUnsupported("Computer account provisioning blob version is not supported.",2719),
+    ERROR_CODE_NOT_FOUND("Error code not found", 404);
     
     private String value;
     private int code;
 
+    /**
+     *
+     * @param value Error code description
+     * @param code Decimal error code
+     */
     NetApiError(String value, int code) {
         this.value = value;
         this.code = code;
@@ -342,12 +358,17 @@ public enum NetApiError {
         return code;
     }
 
+    /**
+     *
+     * @param code WebApi32 or System Error code
+     * @return If error code is not found returns default 404 - not found error.
+     */
     public static NetApiError checkErrorCode(int code) {
         for (NetApiError netApiError : values()) {
             if(netApiError.getCode() == code) {
                 return netApiError;
             }
         }
-        return null;
+        return ERROR_CODE_NOT_FOUND;
     }
 }
