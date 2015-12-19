@@ -72,6 +72,21 @@ public class WindowsNetUser {
     }
 
     //TODO add exception propagation at higher lvl. Controller should display error message. JakubP
+
+    /**
+     * Changes Windows domain or workgroup user password. If server localhost is don't have
+     * access to domain controller / workgroup password won't be changed.
+     *
+     * Password needs to be changed according to Windows password policy. Otherwise throws
+     * password is not changed exception - error code 2425.
+     *
+     * @param domainName hostname or ip address (e.g. mycomp or 192.168.0.105)
+     * @param username Windows account username, domain\username pattern is not allowed
+     * @param oldPassword
+     * @param newPassword
+     * @throws PasswordIsNotChangedException uses NetApi and Windows error codes as exception messages. Mostly 2425
+     * and 86.
+     */
     public static void changeWindowsUserPassword(String domainName, String username, String oldPassword, String newPassword) throws PasswordIsNotChangedException {
         int i = Netapi32.INSTANCE.NetUserChangePassword(domainName, username, oldPassword, newPassword);
         if(i != 0) {
