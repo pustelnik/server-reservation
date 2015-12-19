@@ -19,6 +19,7 @@ import pl.san.jakub.model.data.Users;
 import pl.san.jakub.tools.OperatingSystem;
 import pl.san.jakub.tools.WindowsNetUser;
 import pl.san.jakub.tools.exceptions.Environment;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
 import pl.san.jakub.tools.exceptions.PasswordDoesNotMatchException;
 import pl.san.jakub.tools.exceptions.PasswordIsNotChangedException;
 import pl.san.jakub.tools.SSHConnector;
@@ -93,9 +94,9 @@ public class ServerController {
                     credentials.setPassword(NEW_PASSWORD);
                     LOGGER.info("Ok. Reserving server for user " + name);
                     serversAccess.save(servers);
-                    usersAccess.save(user);
+                    usersAccess.save(user, true);
                     credentialsAccess.save(credentials);
-                } catch (PasswordIsNotChangedException e) {
+                } catch (PasswordIsNotChangedException | GeneralServerException e) {
                     return passwordNotChanged(model, e);
                 }
                 break;
@@ -106,9 +107,9 @@ public class ServerController {
                     credentials.setPassword(NEW_PASSWORD);
                     LOGGER.info("Ok. Reserving server for user " + name);
                     serversAccess.save(servers);
-                    usersAccess.save(user);
+                    usersAccess.save(user, true);
                     credentialsAccess.save(credentials);
-                } catch (PasswordIsNotChangedException e ) {
+                } catch (PasswordIsNotChangedException | GeneralServerException e ) {
                     return passwordNotChanged(model, e);
                 }
                 break;
@@ -159,9 +160,13 @@ public class ServerController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String saveServer(ServerForm form, Model model) {
-        serversAccess.save(new Servers(form.getHost_name(), form.getOs_ip(), form.getIrmc_ip()),
-                new Credentials(form.getIrmc_ip(), form.getIrmcLogin(), form.getIrmcPassword()),
-                new Credentials(form.getOs_ip(), form.getOsLogin(), form.getOsPassword()));
+        try {
+            serversAccess.save(new Servers(form.getHost_name(), form.getOs_ip(), form.getIrmc_ip()),
+                    new Credentials(form.getIrmc_ip(), form.getIrmcLogin(), form.getIrmcPassword()),
+                    new Credentials(form.getOs_ip(), form.getOsLogin(), form.getOsPassword()));
+        } catch (GeneralServerException e) {
+            LOGGER.debug(e.getMessage());
+        }
         return "redirect:/servers";
     }
 
@@ -180,11 +185,11 @@ public class ServerController {
                     WindowsNetUser.changeWindowsUserPassword(server.getHost_name(), os.getLogin(), os.getPassword(), DEFAULT_PASSWORD);
 
                     serversAccess.save(server);
-                    usersAccess.save(user);
+                    usersAccess.save(user, true);
                     os.setPassword(DEFAULT_PASSWORD);
                     credentialsAccess.save(os);
                     return true;
-                } catch (PasswordIsNotChangedException e) {
+                } catch (PasswordIsNotChangedException | GeneralServerException e) {
                     LOGGER.debug(e.getMessage());
                     return false;
                 }
@@ -193,11 +198,11 @@ public class ServerController {
                 try {
                     sshConnector.changePassword(DEFAULT_PASSWORD);
                     serversAccess.save(server);
-                    usersAccess.save(user);
+                    usersAccess.save(user, true);
                     os.setPassword(DEFAULT_PASSWORD);
                     credentialsAccess.save(os);
                     return true;
-                } catch (PasswordIsNotChangedException e) {
+                } catch (PasswordIsNotChangedException | GeneralServerException e) {
                     LOGGER.debug(e.getMessage());
                     return false;
                 }
@@ -208,7 +213,7 @@ public class ServerController {
         return false;
 
     }
-    private String passwordNotChanged(Model model, PasswordIsNotChangedException e) {
+    private String passwordNotChanged(Model model, Exception e) {
         LOGGER.debug(e.getMessage());
         model.addAttribute("error", "Error while reserving server. Changes are not saved!");
         LOGGER.info("Error while reserving server. Changes are not saved!");

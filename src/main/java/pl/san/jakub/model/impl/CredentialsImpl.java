@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import pl.san.jakub.model.CredentialsAccess;
 import pl.san.jakub.model.data.Credentials;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -25,7 +27,7 @@ public class CredentialsImpl implements CredentialsAccess {
 
     @Override
     @Transactional
-    public Credentials save(Credentials credentials) {
+    public Credentials save(Credentials credentials) throws GeneralServerException {
         try {
             if(entityManager.find(Credentials.class, credentials.getIp())!= null) {
                 entityManager.merge(credentials);
@@ -33,6 +35,8 @@ public class CredentialsImpl implements CredentialsAccess {
             }
         } catch (NoResultException e) {
             LOGGER.debug(e.getMessage());
+        } catch (Exception e) {
+            throw new GeneralServerException("Error occured during executing DB query. " +e.getMessage());
         }
         entityManager.persist(credentials);
         return credentials;

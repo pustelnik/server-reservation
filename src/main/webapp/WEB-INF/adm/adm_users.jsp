@@ -18,7 +18,7 @@
 </script>
 <h3>Users</h3>
 <table class="table table-striped">
-    <tr>
+    <tr class="info">
         <th>First name</th>
         <th>Last name</th>
         <th>username</th>

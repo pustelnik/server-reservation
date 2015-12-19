@@ -14,6 +14,8 @@ import pl.san.jakub.model.ServersAccess;
 import pl.san.jakub.model.data.Credentials;
 import pl.san.jakub.model.data.Users;
 import pl.san.jakub.model.data.Servers;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
+
 import java.util.List;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
@@ -38,13 +40,17 @@ public class DataSourceConnectionTest {
     @Test
     @Transactional
     public void createNewServer() {
-        serversAccess.save(
-                new Servers("FRONTSIDE", "172.17.72.156", "172.17.72.56"),
-                new Credentials("172.17.72.56","root", "Password1"),
-                new Credentials("172.17.72.156","admin", "admin"));
+        try {
+            serversAccess.save(
+                    new Servers("FRONTSIDE", "172.17.72.156", "172.17.72.56"),
+                    new Credentials("172.17.72.56","root", "Password1"),
+                    new Credentials("172.17.72.156","admin", "admin"));
 
-        assertEquals("Can't find given server!","FRONTSIDE",
-                serversAccess.findOne("FRONTSIDE").getHost_name());
+            assertEquals("Can't find given server!","FRONTSIDE",
+                    serversAccess.findOne("FRONTSIDE").getHost_name());
+        } catch (GeneralServerException e) {
+            System.out.println(e.getMessage());
+        }
 
     }
 
@@ -85,24 +91,33 @@ public class DataSourceConnectionTest {
     @Test
     @Transactional
     public void createNewProfile() {
-        serversAccess.save(new Servers("RAMMSTEIN", "172.17.72.179", "172.17.72.79"),
-                new Credentials("172.17.72.79","root", "Password1"),
-                new Credentials("172.17.72.179","admin", "admin"));
-        assertEquals("Can't find given server!","RAMMSTEIN", serversAccess.findOne("RAMMSTEIN").getHost_name());
+        try {
+            serversAccess.save(new Servers("RAMMSTEIN", "172.17.72.179", "172.17.72.79"),
+                    new Credentials("172.17.72.79","root", "Password1"),
+                    new Credentials("172.17.72.179","admin", "admin"));
+            assertEquals("Can't find given server!","RAMMSTEIN", serversAccess.findOne("RAMMSTEIN").getHost_name());
 
-        List<Servers> all = (List<Servers>) serversAccess.findAll();
-        Assert.assertThat(all.size(), is(1));
-        usersAccess.save(new Users("Jakub", "P.","zenek", "password", "jakub@email.com", true));
-        Assert.assertNotNull(usersAccess.findAll());
-        assertEquals("Can't find given profile", "zenek", usersAccess.findByUsername("zenek").getUsername());
+            List<Servers> all = (List<Servers>) serversAccess.findAll();
+            Assert.assertThat(all.size(), is(1));
+            usersAccess.save(new Users("Jakub", "P.","zenek", "password", "jakub@email.com", true), false);
+            Assert.assertNotNull(usersAccess.findAll());
+            assertEquals("Can't find given profile", "zenek", usersAccess.findByUsername("zenek").getUsername());
+        } catch (GeneralServerException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     @Test
     @Transactional
     public void createNewCredentials() {
-        credentialsAccess.save(new Credentials("172.17.72.184", "admin", "admin"));
-        Credentials credentials = credentialsAccess.findByIp("172.17.72.184");
-        Assert.assertNotNull(credentials);
+        try {
+            credentialsAccess.save(new Credentials("172.17.72.184", "admin", "admin"));
+            Credentials credentials = credentialsAccess.findByIp("172.17.72.184");
+            Assert.assertNotNull(credentials);
+        } catch (GeneralServerException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Test

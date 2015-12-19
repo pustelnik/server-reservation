@@ -18,7 +18,7 @@
 </script>
 <h3><c:out value="${servers.host_name}"></c:out></h3>
 <table class="table table-striped">
-    <tr>
+    <tr class="info">
         <th>IP</th>
         <th>Login</th>
         <th>Password</th>

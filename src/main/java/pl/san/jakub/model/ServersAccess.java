@@ -2,6 +2,7 @@ package pl.san.jakub.model;
 
 import pl.san.jakub.model.data.Credentials;
 import pl.san.jakub.model.data.Servers;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public interface ServersAccess {
 
-    Servers save(Servers server, Credentials os, Credentials irmc);
+    Servers save(Servers server, Credentials os, Credentials irmc) throws GeneralServerException;
     Servers save(Servers server);
     void delete(String host_name);
     Servers findOne(String host_name);

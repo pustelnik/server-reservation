@@ -1,7 +1,6 @@
 <%@ page import="org.springframework.security.core.Authentication" %>
 <%@ page import="org.springframework.security.core.context.SecurityContextHolder" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
-<%--<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>--%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <nav class="navbar navbar-default navbar-fixed-top ">
@@ -41,9 +40,9 @@
 <div class="col-sm-3 col-md-2 sidebar" <% if(request.isUserInRole("ROLE_ADMIN")) { out.print(""); } else { out.print("style=\"display: none\"");} %>>
     <ul class="nav nav-sidebar">
         <h2 class="admin">Admin</h2>
-        <li><a href="/admin/users">Users</a></li>
-        <li><a href="/admin/servers">Servers</a></li>
-        <li><a href="/admin/addserver">Add server</a></li>
+        <li id="adm_users"><a href="/admin/users">Users</a></li>
+        <li id="adm_servers"><a href="/admin/servers">Servers</a></li>
+        <li id="adm_addserver"><a href="/admin/addserver">Add server</a></li>
     </ul>
 
 </div>

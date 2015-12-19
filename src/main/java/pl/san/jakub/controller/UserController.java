@@ -13,6 +13,7 @@ import pl.san.jakub.model.AuthoritiesAccess;
 import pl.san.jakub.model.UsersAccess;
 import pl.san.jakub.model.data.Authorities;
 import pl.san.jakub.model.data.Users;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
 
 import javax.validation.Valid;
 
@@ -41,12 +42,17 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile/register", method = POST)
-    public String processRegistration(@Valid Users users, Errors errors) {
+    public String processRegistration(@Valid Users users, Errors errors, Model model) {
         if(errors.hasErrors()) {
             return "registerForm";
         }
-        usersAccess.save(users);
-        authoritiesAccess.save(new Authorities(users.getUsername(), "ROLE_USER"));
+        try {
+            usersAccess.save(users, false);
+            authoritiesAccess.save(new Authorities(users.getUsername(), "ROLE_USER"));
+        } catch (GeneralServerException e) {
+            model.addAttribute("error", "Operation failed because DB error!");
+            return "redirect:/profile/register";
+        }
         return "redirect:/profile/" + users.getUsername();
     }
 

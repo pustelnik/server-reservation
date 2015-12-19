@@ -8,7 +8,7 @@
     <title>Admin-panel || Servers</title>
 </head>
 <body>
-<div class="alert alert-success" id="msg" style="display: none">
+<div class="alert alert-info fade in" id="msg" style="display: none">
     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
     <strong>Info!</strong>
 </div>
@@ -19,15 +19,26 @@
         $('#msg').show();
     }
 </script>
+<div class="alert alert-danger fade in" id="error" style="display: none">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Error!</strong>
+</div>
+<script>
+    var x = $.url().param('error');
+    if(x != null) {
+        $('#error').append(x);
+        $('#error').show();
+    }
+</script>
+
    <div class="listTitle">
       <h3>Physical machines</h3>
                <table class="table table-striped">
-            <tr>
+            <tr class="info">
                 <th>Hostname</th>
                 <th>Operating System IP</th>
                 <th>iRMC IP</th>
                 <th>Reservation</th>
-                <th>Options</th>
             </tr>
             <c:forEach items="${servers}" var="server">
 
@@ -46,15 +57,26 @@
                             </form>
                         </c:if>
                     </td>
-                    <td>
-                        <form method="post" action="/admin/removeServer">
-                            <input type="hidden", name="host_name", value="<c:out value="${server.host_name}" />">
-                            <input type="hidden" name="${_csrf.parameterName}"
-                                   value="${_csrf.token}" />
-                            <input class="btn btn-danger" type="submit", value="Remove server">
-                        </form>
+                </tr>
+                <tr style="border: none">
+                    <td style="border: none">
+                        <div id="options">
+                            <form method="post" action="/admin/removeServer" class="buttons-right">
+                                <input type="hidden", name="host_name", value="<c:out value="${server.host_name}" />">
+                                <input type="hidden" name="${_csrf.parameterName}"
+                                       value="${_csrf.token}" />
+                                <input class="btn btn-primary" type="submit", value="Remove server">
+                            </form>
+                            <form method="post" action="/admin/testconnection" class="buttons-right">
+                                <input type="hidden", name="host_name", value="<c:out value="${server.host_name}" />">
+                                <input type="hidden" name="${_csrf.parameterName}"
+                                       value="${_csrf.token}" />
+                                <input class="btn btn-primary" type="submit", value="Test connection">
+                            </form>
+                        </div>
                     </td>
                 </tr>
+
             </c:forEach>
         </table>
     </div>

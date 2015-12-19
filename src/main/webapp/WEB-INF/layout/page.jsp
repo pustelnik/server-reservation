@@ -16,19 +16,18 @@
             type="text/javascript"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            var matchers = [/login/,/admin\/servers/,/home/,/register/,/admin\/users/,/admin\/addserver/];
+            var matchers = [/login/,/admin\/servers/,/home/,/register/,/admin\/users/,/admin\/addserver/,/servers/];
+            var classes = ['login', 'adm_servers', 'home', 'register', 'adm_users', 'adm_addserver', 'servers'];
             var x = window.location.href;
-            var res = '';
+            var res = '#home';
             for(var i = 0; i < matchers.length; i++) {
                 if(x.match(matchers[i])) {
-                    res = x.match(matchers[i]);
+                    res = classes[i];
                     res = '#'+res;
                     break;
                 }
             }
             $(res).addClass("active");
-
-//            document.getElementById(res).classList.add('active');
         });
 
     </script>
@@ -98,6 +97,12 @@
             padding-left: 20px;
             color: #1D4152;
         }
+        #options {
+            display: inline-flex;
+        }
+        .buttons-right {
+            padding-right: 15px;
+        }
     </style>
 </head>
 <body>
@@ -105,9 +110,7 @@
     <t:insertAttribute name="header" />
 </div>
 <div id="content" class="container main">
-
     <t:insertAttribute name="body" />
 </div>
-
 </body>
 </html>

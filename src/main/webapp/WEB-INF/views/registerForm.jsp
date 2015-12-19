@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="t" uri="http://tiles.apache.org/tags-tiles" %>
 <%@ page session="false" contentType="text/html; charset=UTF-8" %>
 
 <html>
@@ -6,6 +7,17 @@
     <title>Spittr</title>
   </head>
   <body>
+  <div class="alert alert-danger" id="error_msg" style="display: none">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Error!</strong>
+  </div>
+  <script>
+    var x = $.url().param('error');
+    if(x != null) {
+      $('#error_msg').append(x);
+      $('#error_msg').show();
+    }
+  </script>
     <h3>Registration</h3>
     <form action="<c:url value="/profile/register" />" method="post" class="form-horizontal" id="register" data-toggle="validator">
     <div class="form-group">

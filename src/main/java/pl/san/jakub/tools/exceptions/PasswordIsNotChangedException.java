@@ -3,7 +3,7 @@ package pl.san.jakub.tools.exceptions;
 /**
  * Created by Jakub on 24.11.2015.
  */
-public class PasswordIsNotChangedException extends Throwable {
+public class PasswordIsNotChangedException extends Exception {
 
     public PasswordIsNotChangedException(String message) {
         super(message);

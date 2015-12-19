@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import pl.san.jakub.model.AuthoritiesAccess;
 import pl.san.jakub.model.data.Authorities;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -24,13 +25,15 @@ public class AuthoritiesImpl implements AuthoritiesAccess{
 
     @Override
     @Transactional
-    public Authorities save(Authorities authorities) {
+    public Authorities save(Authorities authorities) throws GeneralServerException {
         try {
             Authorities auth = find(authorities.getUsername());
             entityManager.merge(authorities);
             return authorities;
         } catch (NoResultException e) {
             LOGGER.debug(e.getMessage());
+        } catch (Exception e) {
+            throw new GeneralServerException("Error occured during executing DB query. " +e.getMessage());
         }
         entityManager.persist(authorities);
         return authorities;

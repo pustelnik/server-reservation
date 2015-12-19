@@ -8,6 +8,7 @@ import pl.san.jakub.model.UsersAccess;
 import pl.san.jakub.model.data.Authorities;
 import pl.san.jakub.model.data.Users;
 import pl.san.jakub.model.data.USER_ROLES;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -27,18 +28,29 @@ public class UsersImpl implements UsersAccess {
 
     @Override
     @Transactional
-    public Users save(Users users) {
+    public Users save(Users users, boolean change) throws GeneralServerException {
 
         try {
-            LOGGER.info("Checking if user exists...");
-            LOGGER.info("User login: {} name: {} last name: {}", users.getUsername(), users.getFirstName(), users.getLastName());
-            entityManager.merge(users);
-            return findByUsername(users.getUsername());
+            if(change) {
+                LOGGER.info("Checking if user exists...");
+                LOGGER.info("User login: {} name: {} last name: {}", users.getUsername(), users.getFirstName(), users.getLastName());
+                entityManager.merge(users);
+                return findByUsername(users.getUsername());
+            } else {
+                throw new GeneralServerException("Error. User already exists.");
+            }
         } catch (NoResultException e) {
-            LOGGER.debug("Can't find user. Creating new one.");
-            entityManager.persist(new Authorities(users.getUsername(), USER_ROLES.USER.getValue()));
-            entityManager.persist(users);
-            return users;
+            try {
+                LOGGER.debug("Can't find user. Creating new one.");
+                entityManager.persist(new Authorities(users.getUsername(), USER_ROLES.USER.getValue()));
+                entityManager.persist(users);
+                return users;
+            } catch (Exception f) {
+                throw new GeneralServerException("Error occured during executing DB query.");
+            }
+
+        } catch (Exception e) {
+            throw new GeneralServerException("Error occured during executing DB query.");
         }
     }
 

@@ -1,5 +1,8 @@
 package pl.san.jakub.controller;
 
+import org.apache.cxf.common.i18n.Exception;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +16,10 @@ import pl.san.jakub.model.UsersAccess;
 import pl.san.jakub.model.data.Credentials;
 import pl.san.jakub.model.data.Servers;
 import pl.san.jakub.model.data.Users;
+import pl.san.jakub.tools.OperatingSystem;
+import pl.san.jakub.tools.WindowsNetUser;
+import pl.san.jakub.tools.WindowsNetUser.ConnectionStatus;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
 import pl.san.jakub.tools.exceptions.ServerCreationException;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -27,6 +34,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/admin")
 public class AdminController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
+    public static final int PING_TIMEOUT = 5;
     private ServersAccess serversAccess;
     private CredentialsAccess credentialsAccess;
     private UsersAccess usersAccess;
@@ -75,7 +84,13 @@ public class AdminController {
         }
         users.setEnabled(isEnabled);
 
-        usersAccess.save(users);
+        try {
+            usersAccess.save(users, true);
+        } catch (GeneralServerException e) {
+            LOGGER.debug(e.getMessage());
+            model.addAttribute("error", "Operation failed because DB error!");
+            return "redirect:/users";
+        }
         model.addAttribute("msg", "Successfully changed user " + users.getUsername() + " account details.");
 
         return "redirect:/admin/users/"+users.getUsername();
@@ -105,7 +120,12 @@ public class AdminController {
             model.addAttribute("error", "Server is not removed!");
             return "adm_servers";
         }
-        removeReservations(server);
+        try {
+            removeReservations(server);
+        } catch (GeneralServerException e) {
+            model.addAttribute("error", "Operation failed because DB error!");
+            return "redirect:/admin/servers";
+        }
         serversAccess.delete(server.getHost_name());
         credentialsAccess.delete(server.getIrmc_ip());
         credentialsAccess.delete(server.getOs_ip());
@@ -113,12 +133,76 @@ public class AdminController {
         return "redirect:/admin/servers";
     }
 
-    private void removeReservations(Servers server) {
+    @RequestMapping(value = "/editServer", method = POST)
+    public String editServer(ServerForm form, Model model) {
+        try {
+            Servers server = serversAccess.findOne(form.getHost_name());
+            Credentials os = credentialsAccess.findByIp(server.getOs_ip());
+            Credentials irmc = credentialsAccess.findByIp(server.getIrmc_ip());
+
+            String irmcLogin = form.getIrmcLogin();
+            String irmcPassword = form.getIrmcPassword();
+            String osLogin = form.getOsLogin();
+            String osPassword = form.getOsPassword();
+
+            if(isNotBlank(irmcLogin)) {
+                irmc.setLogin(irmcLogin);
+            }
+            if(isNotBlank(irmcPassword)) {
+                irmc.setPassword(irmcPassword);
+            }
+            if(isNotBlank(osLogin)) {
+                os.setLogin(osLogin);
+            }
+            if(isNotBlank(osPassword)) {
+                os.setPassword(osPassword);
+            }
+            try {
+                credentialsAccess.save(os);
+                credentialsAccess.save(irmc);
+            } catch (GeneralServerException e) {
+                LOGGER.debug(e.getMessage());
+                model.addAttribute("error", "Operation failed because DB error!");
+            }
+            model.addAttribute("msg", "Successfully changed " + form.getHost_name() + " details.");
+            return "redirect:/admin/servers/"+server.getHost_name();
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug(e.getMessage());
+            model.addAttribute("error", "Applying changes to "+form.getHost_name()+ " FAILED");
+            return "redirect:/admin/servers";
+        }
+
+    }
+
+    @RequestMapping(value = "/testconnection", method = POST)
+    public String testServerConnection(ServerForm form, Model model) {
+        Servers server = serversAccess.findOne(form.getHost_name());
+        Credentials os = credentialsAccess.findByIp(server.getOs_ip());
+        Credentials irmc = credentialsAccess.findByIp(server.getOs_ip());
+
+        try {
+            OperatingSystem operatingSystem = WindowsNetUser.checkOS(server.getOs_ip());
+            ConnectionStatus pingOS = WindowsNetUser.checkConnection(os.getIp(), PING_TIMEOUT);
+            ConnectionStatus pingIRMC = WindowsNetUser.checkConnection(irmc.getIp(),PING_TIMEOUT);
+
+            //TODO add iRMC connection test
+            if(operatingSystem != OperatingSystem.NON_AVAILABLE_PATH && pingOS == ConnectionStatus.OK) {
+                model.addAttribute("msg", pingOS.getValue());
+            } else {
+                model.addAttribute("error", pingOS.getValue() +", "+operatingSystem.getValue());
+            }
+        } catch (GeneralServerException e) {
+           LOGGER.debug(e.getMessage());
+        }
+        return "redirect:/admin/servers";
+    }
+
+    private void removeReservations(Servers server) throws GeneralServerException {
         Users user = server.getUser();
         if(user != null){
             server.setUser(null);
             user.removeHostname(server);
-            usersAccess.save(user);
+            usersAccess.save(user, true);
         }
     }
 
@@ -156,6 +240,9 @@ public class AdminController {
             return "redirect:/admin/servers/"+servers.getHost_name();
         } catch (ServerCreationException e) {
             model.addAttribute("error", "Server creation failed. Attributes can't be empty!");
+            return "adm_server_form";
+        } catch (GeneralServerException e) {
+            model.addAttribute("error", "Operation failed because DB error!");
             return "adm_server_form";
         }
     }

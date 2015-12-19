@@ -20,22 +20,33 @@
 <body>
 <h3><td><c:out value="${servers.host_name}"></c:out></td></h3>
 <table class="table table-striped">
-    <tr>
+    <tr class="info">
         <th></th>
         <th>IP</th>
         <th>Login</th>
         <th>Password</th>
     </tr>
-    <tr>
-        <th>iRMC</th>
-        <td><c:out value="${servers.irmc_ip}"></c:out></td>
-        <td><c:out value="${credentialsIrmc.login}"></c:out></td>
-        <td><c:out value="${credentialsIrmc.password}"></c:out></td>
-    </tr>
-        <th>OS</th>
-        <td><c:out value="${servers.os_ip}"></c:out></td>
-        <td><c:out value="${credentialsOS.login}"></c:out></td>
-        <td><c:out value="${credentialsOS.password}"></c:out></td>
+    <form action="/admin/editServer" method="post">
+        <tr>
+            <th>iRMC</th>
+            <td><c:out value="${servers.irmc_ip}"></c:out></td>
+            <td><input type="text" name="irmcLogin" class="form-control" placeholder="<c:out value="${credentialsIrmc.login}"></c:out>"></td>
+            <td> <input type="text" name="irmcPassword" class="form-control" placeholder="<c:out value="${credentialsIrmc.password}"></c:out>"></td>
+        </tr>
+            <th>OS</th>
+            <td><c:out value="${servers.os_ip}"></c:out></td>
+            <td><input type="text" name="osLogin" class="form-control" placeholder="<c:out value="${credentialsOS.login}"></c:out>"></td>
+            <td><input type="text" name="osPassword" class="form-control" placeholder="<c:out value="${credentialsOS.password}"></c:out>"></td>
+        <tr style="border-top: none">
+            <td style="border-top: none">
+                <input type="hidden" name="${_csrf.parameterName}"
+                       value="${_csrf.token}" />
+                <input type="hidden", name="host_name", value="<c:out value="${servers.host_name}" />">
+                <input type="submit" value="Apply" class="btn btn-primary" >
+            </td>
+        </tr>
+
+    </form>
 </table>
 </body>
 </html>

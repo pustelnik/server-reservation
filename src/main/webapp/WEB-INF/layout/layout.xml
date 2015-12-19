@@ -7,6 +7,7 @@
     <definition name="base" template="/WEB-INF/layout/page.jsp">
         <put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
         <!---->
+
         <put-attribute name="title" value="Server reservation" />
         <put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
     </definition>
@@ -19,7 +20,6 @@
 
     <definition name="registerForm" extends="base">
         <put-attribute name="body" value="/WEB-INF/views/registerForm.jsp" />
-        
         <put-attribute name="title" value="Registration" />
     </definition>
 

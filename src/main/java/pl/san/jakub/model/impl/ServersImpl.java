@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.san.jakub.model.ServersAccess;
 import pl.san.jakub.model.data.Credentials;
 import pl.san.jakub.model.data.Servers;
+import pl.san.jakub.tools.exceptions.GeneralServerException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -22,15 +23,19 @@ public class ServersImpl implements ServersAccess {
 
     @Override
     @Transactional
-    public Servers save(Servers server, Credentials os, Credentials irmc) {
-        if(null == findOne(server.getHost_name())) {
-            entityManager.persist(os);
-            entityManager.persist(irmc);
-            entityManager.persist(server);
+    public Servers save(Servers server, Credentials os, Credentials irmc) throws GeneralServerException {
+        try {
+            if(null == findOne(server.getHost_name())) {
+                entityManager.persist(os);
+                entityManager.persist(irmc);
+                entityManager.persist(server);
 
-            return server;
+                return server;
+            }
+            return null;
+        } catch (Exception e) {
+            throw new GeneralServerException("Error occured during executing DB query. "+e.getMessage());
         }
-        return null;
     }
 
     @Override
