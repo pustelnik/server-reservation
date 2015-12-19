@@ -1,4 +1,4 @@
-package pl.san.jakub.tools.exceptions;
+package pl.san.jakub.tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

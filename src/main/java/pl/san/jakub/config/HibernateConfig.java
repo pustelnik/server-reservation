@@ -11,7 +11,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
-import pl.san.jakub.tools.exceptions.Environment;
+import pl.san.jakub.tools.Environment;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;

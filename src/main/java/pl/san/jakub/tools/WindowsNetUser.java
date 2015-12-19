@@ -15,6 +15,8 @@ import java.net.UnknownHostException;
 
 /**
  * Created by Jakub on 05.12.2015.
+ *
+ * Error codes description available at https://msdn.microsoft.com/en-us/library/windows/desktop/aa370674(v=vs.85).aspx
  */
 public class WindowsNetUser {
 
@@ -72,7 +74,9 @@ public class WindowsNetUser {
 
     public static void changeWindowsUserPassword(String domainName, String username, String oldPassword, String newPassword) throws PasswordIsNotChangedException {
         int i = Netapi32.INSTANCE.NetUserChangePassword(domainName, username, oldPassword, newPassword);
-        if(i != 0) throw new PasswordIsNotChangedException("Password is not changed!");
+        if(i != 0) {
+            throw new PasswordIsNotChangedException(NetApiError.checkErrorCode(i).getValue());
+        }
     }
 
     public enum ConnectionStatus {

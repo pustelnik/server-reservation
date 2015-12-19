@@ -18,9 +18,8 @@ import pl.san.jakub.model.data.Servers;
 import pl.san.jakub.model.data.Users;
 import pl.san.jakub.tools.OperatingSystem;
 import pl.san.jakub.tools.WindowsNetUser;
-import pl.san.jakub.tools.exceptions.Environment;
+import pl.san.jakub.tools.Environment;
 import pl.san.jakub.tools.exceptions.GeneralServerException;
-import pl.san.jakub.tools.exceptions.PasswordDoesNotMatchException;
 import pl.san.jakub.tools.exceptions.PasswordIsNotChangedException;
 import pl.san.jakub.tools.SSHConnector;
 
@@ -90,7 +89,7 @@ public class ServerController {
 
             case WINDOWS:
                 try {
-                    WindowsNetUser.changeWindowsUserPassword(servers.getHost_name(), credentials.getLogin(), credentials.getPassword(), NEW_PASSWORD);
+                    WindowsNetUser.changeWindowsUserPassword(servers.getOs_ip(), credentials.getLogin(), credentials.getPassword(), NEW_PASSWORD);
                     credentials.setPassword(NEW_PASSWORD);
                     LOGGER.info("Ok. Reserving server for user " + name);
                     serversAccess.save(servers);
