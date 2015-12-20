@@ -318,7 +318,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
-                        <descriptor>test-jar-with-dependencies.xml</descriptor>
+                        <descriptor>compile-jar-with-dependencies.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifest>
