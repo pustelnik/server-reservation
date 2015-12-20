@@ -1,4 +1,4 @@
-package pl.san.jakub.controller;
+package pl.san.jakub.controller.forms;
 
 import org.eclipse.jetty.util.StringUtil;
 import pl.san.jakub.model.data.Credentials;
@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
  */
 public class ServerForm {
 
+    private static final String EMPTY_FIELD = "Empty field!";
     @Size(min = 4, max = 15, message = "{host_name.size}")
     private String host_name;
     @Size(min = 7, max = 15, message = "{irmc_ip.size}")
@@ -87,7 +88,7 @@ public class ServerForm {
         String[] temp = {getIrmc_ip(), getIrmcLogin(), getIrmcPassword()};
         for (String s : temp) {
             if(StringUtil.isBlank(s)) {
-                throw new ServerCreationException("Empty field!");
+                throw new ServerCreationException(EMPTY_FIELD);
             }
         }
         return new Credentials(temp[0], temp[1], temp[2]);
@@ -96,7 +97,7 @@ public class ServerForm {
         String[] temp = {getOs_ip(), getOsLogin(), getOsPassword()};
         for (String s : temp) {
             if(StringUtil.isBlank(s)) {
-                throw new ServerCreationException("Empty field!");
+                throw new ServerCreationException(EMPTY_FIELD);
             }
         }
         return new Credentials(temp[0], temp[1], temp[2]);
@@ -105,7 +106,7 @@ public class ServerForm {
         String[] temp = {getHost_name(), getOs_ip(), getIrmc_ip()};
         for (String s : temp) {
             if(StringUtil.isBlank(s)) {
-                throw new ServerCreationException("Empty field!");
+                throw new ServerCreationException(EMPTY_FIELD);
             }
         }
         return new Servers(temp[0], temp[1], temp[2]);

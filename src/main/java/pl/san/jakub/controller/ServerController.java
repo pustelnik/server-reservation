@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import pl.san.jakub.controller.forms.ServerForm;
 import pl.san.jakub.model.CredentialsAccess;
 import pl.san.jakub.model.ServersAccess;
 import pl.san.jakub.model.UsersAccess;
@@ -55,7 +56,7 @@ public class ServerController {
     }
 
     @RequestMapping(value = "/reserve",method = RequestMethod.POST)
-    public String reserveServer(ServerForm serverForm,  Model model) {
+    public String reserveServer(ServerForm serverForm, Model model) {
 
         String host_name = serverForm.getHost_name();
         LOGGER.info("SEARCHING FOR SERVER: " + host_name + "!");
@@ -126,7 +127,13 @@ public class ServerController {
         LOGGER.info("SEARCHING FOR SERVER: " + host_name + "!");
         Servers servers = serversAccess.findOne(host_name);
 
-        boolean done = restoreDefaultPassword(servers);
+        boolean done = false;
+        try {
+            done = restoreDefaultPassword(servers);
+        } catch (PasswordIsNotChangedException e) {
+            LOGGER.debug(e.getMessage());
+            model.addAttribute("error",e.getMessage());
+        }
         if(done) {
             model.addAttribute("msg", servers.getHost_name() +" reservation canceled successfully.");
         }
@@ -169,7 +176,7 @@ public class ServerController {
         return "redirect:/servers";
     }
 
-    private boolean restoreDefaultPassword(Servers server) {
+    private boolean restoreDefaultPassword(Servers server) throws PasswordIsNotChangedException {
         Users user = server.getUser();
         user.removeHostname(server);
         server.setUser(null);
@@ -190,7 +197,7 @@ public class ServerController {
                     return true;
                 } catch (PasswordIsNotChangedException | GeneralServerException e) {
                     LOGGER.debug(e.getMessage());
-                    return false;
+                    throw new PasswordIsNotChangedException(e.getMessage());
                 }
             case LINUX:
                 SSHConnector sshConnector = new SSHConnector(os.getIp(), DEFAULT_PORT, os.getLogin(), os.getPassword());
@@ -214,7 +221,7 @@ public class ServerController {
     }
     private String passwordNotChanged(Model model, Exception e) {
         LOGGER.debug(e.getMessage());
-        model.addAttribute("error", "Error while reserving server. Changes are not saved!");
+        model.addAttribute("error", "Error while reserving server. Changes are not saved! "+e.getMessage());
         LOGGER.info("Error while reserving server. Changes are not saved!");
         return "redirect:/servers";
     }

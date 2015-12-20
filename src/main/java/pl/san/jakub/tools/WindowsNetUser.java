@@ -71,8 +71,6 @@ public class WindowsNetUser {
         }
     }
 
-    //TODO add exception propagation at higher lvl. Controller should display error message. JakubP
-
     /**
      * Changes Windows domain or workgroup user password. If server localhost is don't have
      * access to domain controller / workgroup password won't be changed.
@@ -81,7 +79,7 @@ public class WindowsNetUser {
      * password is not changed exception - error code 2425.
      *
      * @param domainName hostname or ip address (e.g. mycomp or 192.168.0.105)
-     * @param username Windows account username, domain\username pattern is not allowed
+     * @param username Windows account username, domain or username pattern is not allowed
      * @param oldPassword
      * @param newPassword
      * @throws PasswordIsNotChangedException uses NetApi and Windows error codes as exception messages. Mostly 2425

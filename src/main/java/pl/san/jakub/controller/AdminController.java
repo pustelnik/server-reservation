@@ -1,6 +1,5 @@
 package pl.san.jakub.controller;
 
-import org.apache.cxf.common.i18n.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import pl.san.jakub.controller.forms.RegisterForm;
+import pl.san.jakub.controller.forms.ServerForm;
 import pl.san.jakub.model.AuthoritiesAccess;
 import pl.san.jakub.model.CredentialsAccess;
 import pl.san.jakub.model.ServersAccess;

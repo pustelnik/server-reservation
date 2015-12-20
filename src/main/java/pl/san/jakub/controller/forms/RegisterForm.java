@@ -1,4 +1,4 @@
-package pl.san.jakub.controller;
+package pl.san.jakub.controller.forms;
 
 import pl.san.jakub.model.data.Users;
 import javax.validation.constraints.Size;

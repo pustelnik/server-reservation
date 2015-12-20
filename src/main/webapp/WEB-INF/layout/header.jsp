@@ -39,7 +39,7 @@
 </nav>
 <div class="col-sm-3 col-md-2 sidebar" <% if(request.isUserInRole("ROLE_ADMIN")) { out.print(""); } else { out.print("style=\"display: none\"");} %>>
     <ul class="nav nav-sidebar">
-        <h2 class="admin">Admin</h2>
+        <h3 class="admin">Admin</h3>
         <li id="adm_users"><a href="/admin/users">Users</a></li>
         <li id="adm_servers"><a href="/admin/servers">Servers</a></li>
         <li id="adm_addserver"><a href="/admin/addserver">Add server</a></li>
