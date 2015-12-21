@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -13,19 +14,42 @@ import java.util.Properties;
 public class Environment {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Environment.class);
+    private static final String PATH;
+    public static final String CONF_SERVER_PROPERTIES = "conf/server.properties";
+
+    static {
+        PATH = getPath(ClassLoader.getSystemResource("").getPath());
+        LOGGER.info("Searching in path: "+PATH);
+    }
+    private Environment() {};
+
+    public static void main(String[] args) {
+        String path = ClassLoader.getSystemResource("").getPath();
+        String[] temp = path.split("/");
+        System.out.println(Arrays.toString(temp));
+    }
+    private static String getPath(String path) {
+        String[] temp = path.split("/");
+        StringBuilder result = new StringBuilder();
+        if(path.contains("jar")) {
+            for(int i = 0; i < temp.length - 1; i++) {
+                result.append(temp[i]).append("/");
+            }
+            result.append(CONF_SERVER_PROPERTIES);
+            return result.toString().replace("file:/", "");
+        } else {
+            for (int i = 0; i < temp.length - 2; i++) {
+                result.append(temp[i]).append("/");
+            }
+            result.append(CONF_SERVER_PROPERTIES);
+            return result.toString();
+        }
+    }
 
     public static String readProperty(String propertyName) {
         Properties properties = new Properties();
         try {
-            String path = ClassLoader.getSystemResource("").getPath()
-                    .replace("target/classes/", "conf/server.properties");
-            if(path.contains("jar")) {
-                path = ClassLoader.getSystemResource("").getPath()
-                        .replace("server-reservation-1.0-SNAPSHOT-compile-jar-with-dependencies.jar!/",
-                                "conf/server.properties").replace("file:/", "");
-            }
-            LOGGER.info("Searching in path: "+path);
-            readFile(properties, path);
+            readFile(properties, PATH);
         }
         catch (NullPointerException e) {
             LOGGER.info(e.getMessage());
@@ -46,5 +70,6 @@ public class Environment {
             LOGGER.info(e.getMessage());
         }
     }
+
 
 }
