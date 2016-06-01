@@ -30,20 +30,31 @@
         $('#error').show();
     }
 </script>
+<script>
+    $(document).ready(function()
+            {
+                $("#servers-table").tablesorter();
+            }
+    );
 
+</script>
    <div class="listTitle">
       <h3>Physical machines</h3>
-               <table class="table table-striped">
-            <tr class="info">
-                <th>Hostname</th>
-                <th>Operating System IP</th>
-                <th>iRMC IP</th>
-                <th>Reservation</th>
-            </tr>
+               <table class="table table-striped" id="servers-table">
+                   <thead>
+                        <tr class="info">
+                            <th>Hostname</th>
+                            <th>Operating System IP</th>
+                            <th>iRMC IP</th>
+                            <th>Reservation</th>
+                            <th></th>
+                        </tr>
+                   </thead>
+                   <tbody>
             <c:forEach items="${servers}" var="server">
 
                 <tr>
-                    <td><a href="/admin/servers/<c:out value="${server.host_name}" />"><c:out value="${server.host_name}" /></td>
+                    <td><a href="/admin/servers/<c:out value="${server.host_name}" />"><c:out value="${server.host_name}" /></a>
                     <td><a href="/admin/servers/<c:out value="${server.os_ip}" />/credentials"><c:out value="${server.os_ip}" /></a></td>
                     <td><a href="/admin/servers/<c:out value="${server.irmc_ip}" />/credentials"><c:out value="${server.irmc_ip}" /></a></td>
                     <td>
@@ -57,27 +68,24 @@
                             </form>
                         </c:if>
                     </td>
-                </tr>
-                <tr style="border: none">
-                    <td style="border: none">
-                        <div id="options">
-                            <form method="post" action="/admin/removeServer" class="buttons-right">
-                                <input type="hidden", name="host_name", value="<c:out value="${server.host_name}" />">
-                                <input type="hidden" name="${_csrf.parameterName}"
-                                       value="${_csrf.token}" />
-                                <input class="btn btn-primary" type="submit", value="Remove server">
-                            </form>
-                            <form method="post" action="/admin/testconnection" class="buttons-right">
-                                <input type="hidden", name="host_name", value="<c:out value="${server.host_name}" />">
-                                <input type="hidden" name="${_csrf.parameterName}"
-                                       value="${_csrf.token}" />
-                                <input class="btn btn-primary" type="submit", value="Test connection">
-                            </form>
-                        </div>
-                    </td>
+                    <td><div id="options">
+                        <form method="post" action="/admin/testconnection" class="buttons-right">
+                            <input type="hidden", name="host_name", value="<c:out value="${server.host_name}" />">
+                            <input type="hidden" name="${_csrf.parameterName}"
+                                   value="${_csrf.token}" />
+                            <input class="btn btn-primary" type="submit", value="Test connection">
+                        </form>
+                        <form method="post" action="/admin/removeServer" class="buttons-right">
+                            <input type="hidden", name="host_name", value="<c:out value="${server.host_name}" />">
+                            <input type="hidden" name="${_csrf.parameterName}"
+                                   value="${_csrf.token}" />
+                            <input class="btn btn-primary" type="submit", value="Remove server">
+                        </form>
+                    </div></td></td>
                 </tr>
 
             </c:forEach>
+                   </tbody>
         </table>
     </div>
 </body>

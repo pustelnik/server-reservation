@@ -28,15 +28,26 @@
           $('#error').show();
       }
   </script>
+  <script>
+      $(document).ready(function()
+              {
+                  $("#servers-table").tablesorter();
+              }
+      );
+
+  </script>
     <div class="listTitle">
       <h3>Physical machines</h3>
-        <table class="table table-striped">
+        <table class="table table-striped" id="servers-table">
+            <thead>
             <tr>
                 <th>Hostname</th>
                 <th>Operating System IP</th>
                 <th>iRMC IP</th>
                 <th>Reservation</th>
             </tr>
+            </thead>
+            <tbody>
             <c:forEach items="${serversList}" var="server" >
                 <tr>
                     <td><a href="/servers/<c:out value="${server.host_name}" />"><c:out value="${server.host_name}" /></td>
@@ -54,6 +65,7 @@
                     </td>
                 </tr>
             </c:forEach>
+            </tbody>
         </table>
 
 

@@ -31,6 +31,8 @@
         });
 
     </script>
+    <script src = "/resources/css/__jquery.tablesorter/jquery.metadata.js" type="text/javascript"></script>
+    <script src = "/resources/css/__jquery.tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
     <style>
         .footer {
             position: fixed;

@@ -16,15 +16,22 @@
         $('#msg').show();
     }
 </script>
+<script type="text/javascript">
+    $(document).ready(function()
+            {
+                $("#users-table").tablesorter();
+            }
+    );
+
+</script>
 <h3>Users</h3>
-<table class="table table-striped">
+<table class="table table-striped" id="users-table">
     <tr class="info">
         <th>First name</th>
         <th>Last name</th>
         <th>username</th>
         <th>Reserved servers</th>
-        <th>Edit</th>
-        <th>Remove</th>
+        <th></th>
     </tr>
     <c:forEach items="${users}" var="user">
         <tr>
@@ -34,13 +41,15 @@
             <td><c:forEach items="${user.host_names}" var="host_name">
                 <a href="/servers/<c:out value="${host_name}"></c:out>"><c:out value="${host_name}"></c:out></a>,
             </c:forEach></td>
-            <td><a class="btn btn-info" href="/admin/users/<c:out value="${user.username}"></c:out>">Edit</a></td>
             <td>
-                <form action="/admin/removeUser", method="post">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                    <input type="hidden" name="username", value="<c:out value="${user.username}"></c:out>" />
-                    <input class="btn btn-danger" type="submit", value="Remove user">
-                </form>
+                <div id="options">
+                    <div style="display: inline-block"><a class="btn btn-info buttons-right" href="/admin/users/<c:out value="${user.username}"></c:out>">Edit</a></div>
+                    <form action="/admin/removeUser", method="post" class="buttons-right" style="display: inline-block;">
+                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                        <input type="hidden" name="username", value="<c:out value="${user.username}"></c:out>" />
+                        <input class="btn btn-danger" type="submit", value="Remove user">
+                    </form>
+                </div>
             </td>
         </tr>
     </c:forEach>
