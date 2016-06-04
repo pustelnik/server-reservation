@@ -1,10 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>Admin - panel || Users</title>
-</head>
-<body>
+
 <div class="alert alert-success" id="msg" style="display: none">
     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
     <strong>Info!</strong>
@@ -26,7 +22,7 @@
 </script>
 <h3>Users</h3>
 <table class="table table-striped" id="users-table">
-    <tr class="info">
+    <tr>
         <th>First name</th>
         <th>Last name</th>
         <th>username</th>
@@ -35,18 +31,18 @@
     </tr>
     <c:forEach items="${users}" var="user">
         <tr>
-            <td><c:out value="${user.firstName}"></c:out></td>
-            <td><c:out value="${user.lastName}"></c:out></td>
-            <td><c:out value="${user.username}"></c:out></td>
+            <td><c:out value="${user.firstName}"/></td>
+            <td><c:out value="${user.lastName}"/></td>
+            <td><c:out value="${user.username}"/></td>
             <td><c:forEach items="${user.host_names}" var="host_name">
-                <a href="/servers/<c:out value="${host_name}"></c:out>"><c:out value="${host_name}"></c:out></a>,
+                <a href="/servers/<c:out value="${host_name}"/>"><c:out value="${host_name}"/></a>,
             </c:forEach></td>
             <td>
                 <div id="options">
-                    <div style="display: inline-block"><a class="btn btn-info buttons-right" href="/admin/users/<c:out value="${user.username}"></c:out>">Edit</a></div>
+                    <div class="option"><a class="btn btn-info buttons-right" href="/admin/users/<c:out value="${user.username}"/>">Edit</a></div>
                     <form action="/admin/removeUser", method="post" class="buttons-right" style="display: inline-block;">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                        <input type="hidden" name="username", value="<c:out value="${user.username}"></c:out>" />
+                        <input type="hidden" name="username", value="<c:out value="${user.username}"/>" />
                         <input class="btn btn-danger" type="submit", value="Remove user">
                     </form>
                 </div>
@@ -54,5 +50,3 @@
         </tr>
     </c:forEach>
 </table>
-</body>
-</html>

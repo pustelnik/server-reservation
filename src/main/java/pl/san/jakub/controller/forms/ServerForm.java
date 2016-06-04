@@ -15,7 +15,7 @@ public class ServerForm {
     private static final String EMPTY_FIELD = "Empty field!";
     @Size(min = 4, max = 15, message = "{host_name.size}")
     private String host_name;
-    @Size(min = 7, max = 15, message = "{irmc_ip.size}")
+    @Size(min = 7, max = 15, message = "${irmc_ip.size}")
     private String irmc_ip;
     @Size(min = 7, max = 15, message = "{os_ip.size}")
     private String os_ip;
@@ -27,6 +27,55 @@ public class ServerForm {
     private String osLogin;
     @Size(min = 4, max = 15, message = "{osPassword.size}")
     private String osPassword;
+    @Size(min = 4, max = 15, message = "{model.size}")
+    private String model;
+    @Size(min = 4, max = 15, message = "{rackPosition.size}")
+    private String rackPosition;
+    @Size(min = 4, max = 15, message = "{lan.size}")
+    private String lan;
+    @Size(min = 4, max = 15, message = "{operatingSystem.size}")
+    private String operatingSystem;
+    private String comment;
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getRackPosition() {
+        return rackPosition;
+    }
+
+    public void setRackPosition(String rackPosition) {
+        this.rackPosition = rackPosition;
+    }
+
+    public String getLan() {
+        return lan;
+    }
+
+    public void setLan(String lan) {
+        this.lan = lan;
+    }
+
+    public String getOperatingSystem() {
+        return operatingSystem;
+    }
+
+    public void setOperatingSystem(String operatingSystem) {
+        this.operatingSystem = operatingSystem;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
     public String getHost_name() {
         return host_name;
@@ -109,6 +158,6 @@ public class ServerForm {
                 throw new ServerCreationException(EMPTY_FIELD);
             }
         }
-        return new Servers(temp[0], temp[1], temp[2]);
+        return new Servers(temp[0], temp[1], temp[2],getModel(),getRackPosition(),getLan(),getOperatingSystem(),getComment());
     }
 }

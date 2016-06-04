@@ -2,11 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<html>
-<head>
-    <title><c:out value="${servers.host_name}"></c:out></title>
-</head>
-<body>
+
 <h3><td><c:out value="${servers.host_name}"></c:out></td></h3>
 <table class="table table-striped">
     <tr>
@@ -17,14 +13,14 @@
     </tr>
     <tr>
         <th>iRMC</th>
-        <td><c:out value="${servers.irmc_ip}"></c:out></td>
-        <td><c:out value="${credentialsIrmc.login}"></c:out></td>
-        <td><c:out value="${credentialsIrmc.password}"></c:out></td>
+        <td><c:out value="${servers.irmc_ip}"/></td>
+        <td><c:out value="${credentialsIrmc.login}"/></td>
+        <td><c:out value="${credentialsIrmc.password}"/></td>
     </tr>
         <th>OS</th>
-    <td><c:out value="${servers.os_ip}"></c:out></td>
-        <td><c:out value="${credentialsOS.login}"></c:out></td>
-        <td><c:out value="${credentialsOS.password}"></c:out></td>
+    <td><c:out value="${servers.os_ip}"/></td>
+        <td><c:out value="${credentialsOS.login}"/></td>
+        <td><c:out value="${credentialsOS.password}"/></td>
 </table>
 <form method="post" action="/servers/reserve/resign" name="serverForm">
     <input type="hidden", name="host_name", value="<c:out value="${servers.host_name}" />">
@@ -32,5 +28,3 @@
            value="${_csrf.token}" />
     <input class="btn btn-success"  type="submit", value="Resign">
 </form>
-</body>
-</html>

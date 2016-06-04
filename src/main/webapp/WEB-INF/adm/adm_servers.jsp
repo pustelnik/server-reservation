@@ -3,11 +3,6 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 
-<html>
-<head>
-    <title>Admin-panel || Servers</title>
-</head>
-<body>
 <div class="alert alert-info fade in" id="msg" style="display: none">
     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
     <strong>Info!</strong>
@@ -42,11 +37,16 @@
       <h3>Physical machines</h3>
                <table class="table table-striped" id="servers-table">
                    <thead>
-                        <tr class="info">
+                        <tr>
+                            <th>Reservation</th>
                             <th>Hostname</th>
+                            <th>Model</th>
                             <th>Operating System IP</th>
                             <th>iRMC IP</th>
-                            <th>Reservation</th>
+                            <th>Rack Position</th>
+                            <th>LAN</th>
+                            <th>Operating System</th>
+                            <th>Comment</th>
                             <th></th>
                         </tr>
                    </thead>
@@ -54,9 +54,6 @@
             <c:forEach items="${servers}" var="server">
 
                 <tr>
-                    <td><a href="/admin/servers/<c:out value="${server.host_name}" />"><c:out value="${server.host_name}" /></a>
-                    <td><a href="/admin/servers/<c:out value="${server.os_ip}" />/credentials"><c:out value="${server.os_ip}" /></a></td>
-                    <td><a href="/admin/servers/<c:out value="${server.irmc_ip}" />/credentials"><c:out value="${server.irmc_ip}" /></a></td>
                     <td>
                         <c:if test="${server.user.username != null}">
                             <form method="post" action="/admin/cancelReservation" name="serverForm">
@@ -68,6 +65,14 @@
                             </form>
                         </c:if>
                     </td>
+                    <td><a href="/admin/servers/<c:out value="${server.host_name}" />"><c:out value="${server.host_name}" /></a>
+                    <td><c:out value="${server.model}" /></td>
+                    <td><a href="/admin/servers/<c:out value="${server.os_ip}" />/credentials"><c:out value="${server.os_ip}" /></a></td>
+                    <td><a href="/admin/servers/<c:out value="${server.irmc_ip}" />/credentials"><c:out value="${server.irmc_ip}" /></a></td>
+                    <td><c:out value="${server.rackPosition}" /></td>
+                    <td><c:out value="${server.lan}" /></td>
+                    <td><c:out value="${server.operatingSystem}" /></td>
+                    <td><c:out value="${server.comment}" /></td>
                     <td><div id="options">
                         <form method="post" action="/admin/testconnection" class="buttons-right">
                             <input type="hidden", name="host_name", value="<c:out value="${server.host_name}" />">
@@ -88,5 +93,3 @@
                    </tbody>
         </table>
     </div>
-</body>
-</html>

@@ -1,19 +1,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>Admin - panel | User <c:out value="${user.username}"></c:out></title>
-    <script>
-        $('form').on('submit',function(){
-            if($('#pass').val()!=$('#passwordConfirm').val()){
-                alert('Password not matches');
-                return false;
-            }
-            return true;
-        });
-    </script>
-</head>
-<body>
+
+<script>
+    $('form').on('submit',function(){
+        if($('#pass').val()!=$('#passwordConfirm').val()){
+            alert('Password not matches');
+            return false;
+        }
+        return true;
+    });
+</script>
 <div class="alert alert-success" id="msg" style="display: none">
     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
     <strong>Info!</strong>
@@ -25,20 +21,20 @@
         $('#msg').show();
     }
 </script>
-<h3><strong><c:out value="${user.username}"></c:out></strong></h3>
+<h3><strong><c:out value="${user.username}"/></strong></h3>
 
 <form action="<c:url value='/admin/users' />" method="post" class="form-horizontal" id="login" data-toggle="validator">
     <div class="form-group">
         <label for="firstName" class="col-sm-2 control-label">First name</label>
         <div class="col-sm-10">
-            <input type="text" name="firstName" maxlength="15" class="form-control" placeholder="<c:out value="${user.firstName}"></c:out>">
+            <input type="text" name="firstName" maxlength="15" class="form-control" placeholder="<c:out value="${user.firstName}"/>">
             <div class="help-block with-errors"></div>
         </div>
     </div>
     <div class="form-group">
         <label for="lastName" class="col-sm-2 control-label">Last name</label>
         <div class="col-sm-10">
-            <input type="text" name="lastName" maxlength="15" class="form-control" placeholder="<c:out value="${user.lastName}"></c:out>">
+            <input type="text" name="lastName" maxlength="15" class="form-control" placeholder="<c:out value="${user.lastName}"/>">
             <div class="help-block with-errors"></div>
         </div>
     </div>
@@ -69,12 +65,10 @@
     </div>
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-            <input type="submit" value="Confirm changes!" class="btn btn-default">
+            <input type="submit" value="Apply changes" class="btn btn-default">
         </div>
     </div>
-    <input type="hidden" name="username" value="<c:out value="${user.username}"></c:out>">
+    <input type="hidden" name="username" value="<c:out value="${user.username}"/>">
     <input type="hidden" name="${_csrf.parameterName}"
            value="${_csrf.token}" />
 </form>
-</body>
-</html>

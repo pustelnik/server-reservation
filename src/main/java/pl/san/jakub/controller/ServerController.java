@@ -17,12 +17,9 @@ import pl.san.jakub.model.UsersAccess;
 import pl.san.jakub.model.data.Credentials;
 import pl.san.jakub.model.data.Servers;
 import pl.san.jakub.model.data.Users;
-import pl.san.jakub.tools.OperatingSystem;
-import pl.san.jakub.tools.WindowsNetUser;
 import pl.san.jakub.tools.Environment;
 import pl.san.jakub.tools.exceptions.GeneralServerException;
 import pl.san.jakub.tools.exceptions.PasswordIsNotChangedException;
-import pl.san.jakub.tools.SSHConnector;
 
 import java.util.List;
 
@@ -34,21 +31,20 @@ import java.util.List;
 @RequestMapping("/servers")
 public class ServerController {
 
-    private static final int DEFAULT_PORT = 2222;
-    private static final String NEW_PASSWORD = Environment.readProperty("server.new.password");
-    private static final String DEFAULT_PASSWORD = Environment.readProperty("server.default.password");
-    private ServersAccess serversAccess;
-    private UsersAccess usersAccess;
-    private CredentialsAccess credentialsAccess;
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerController.class);
+    private static final boolean PASSWORD_CHANGE_ENABLED = Environment.readBooleanProperty("server.password.change");
+    private final ServersAccess serversAccess;
+    private final UsersAccess usersAccess;
+    private final CredentialsAccess credentialsAccess;
+    private final OsPasswordChange osPasswordChange;
 
     @Autowired
     public ServerController(ServersAccess serversAccess, UsersAccess usersAccess, CredentialsAccess credentialsAccess) {
         this.serversAccess = serversAccess;
         this.usersAccess = usersAccess;
         this.credentialsAccess = credentialsAccess;
+        this.osPasswordChange = new OsPasswordChange(serversAccess,usersAccess,credentialsAccess);
     }
-
 
     @RequestMapping(method = RequestMethod.GET)
     public List<Servers> servers() {
@@ -78,47 +74,16 @@ public class ServerController {
             user.addHostname(servers);
             Credentials credentials = credentialsAccess.findByIp(servers.getOs_ip());
 
-            String viewName = changeOsPassword(model, servers, name, user, credentials);
-            if (viewName != null) return viewName;
+            if(PASSWORD_CHANGE_ENABLED) {
+                try {
+                    String viewName = osPasswordChange.changeOsPassword(model, servers, name, user, credentials);
+                    if (viewName != null) return viewName;
+                } catch (GeneralServerException e) {
+                    LOGGER.warn(e.getMessage());
+                }
+            }
         }
         return "redirect:/servers/" + servers.getHost_name();
-    }
-
-    private String changeOsPassword(Model model, Servers servers, String name, Users user, Credentials credentials) {
-        OperatingSystem operatingSystem = WindowsNetUser.checkOS(servers.getHost_name());
-        switch (operatingSystem) {
-
-            case WINDOWS:
-                try {
-                    WindowsNetUser.changeWindowsUserPassword(servers.getOs_ip(), credentials.getLogin(), credentials.getPassword(), NEW_PASSWORD);
-                    credentials.setPassword(NEW_PASSWORD);
-                    LOGGER.info("Ok. Reserving server for user " + name);
-                    serversAccess.save(servers);
-                    usersAccess.save(user, true);
-                    credentialsAccess.save(credentials);
-                } catch (PasswordIsNotChangedException | GeneralServerException e) {
-                    return passwordNotChanged(model, e);
-                }
-                break;
-            case LINUX:
-                SSHConnector sshConnector = new SSHConnector(credentials.getIp(), DEFAULT_PORT, credentials.getLogin(), credentials.getPassword());
-                try {
-                    sshConnector.changePassword(NEW_PASSWORD);
-                    credentials.setPassword(NEW_PASSWORD);
-                    LOGGER.info("Ok. Reserving server for user " + name);
-                    serversAccess.save(servers);
-                    usersAccess.save(user, true);
-                    credentialsAccess.save(credentials);
-                } catch (PasswordIsNotChangedException | GeneralServerException e ) {
-                    return passwordNotChanged(model, e);
-                }
-                break;
-            case NON_AVAILABLE_PATH:
-                model.addAttribute("error", "Can't connect to server! Reservation failed.");
-                return "redirect:/servers";
-
-        }
-        return null;
     }
 
     @RequestMapping(value = "/reserve/resign", method = RequestMethod.POST)
@@ -127,9 +92,12 @@ public class ServerController {
         LOGGER.info("SEARCHING FOR SERVER: " + host_name + "!");
         Servers servers = serversAccess.findOne(host_name);
 
+        if(!PASSWORD_CHANGE_ENABLED) {
+            return "redirect:/servers";
+        }
         boolean done = false;
         try {
-            done = restoreDefaultPassword(servers);
+            done = osPasswordChange.restoreDefaultPassword(servers);
         } catch (PasswordIsNotChangedException e) {
             LOGGER.debug(e.getMessage());
             model.addAttribute("error",e.getMessage());
@@ -167,7 +135,8 @@ public class ServerController {
     @RequestMapping(method = RequestMethod.POST)
     public String saveServer(ServerForm form, Model model) {
         try {
-            serversAccess.save(new Servers(form.getHost_name(), form.getOs_ip(), form.getIrmc_ip()),
+            serversAccess.save(new Servers(form.getHost_name(), form.getOs_ip(), form.getIrmc_ip(), form.getModel(),
+                            form.getRackPosition(), form.getLan(), form.getOperatingSystem(), form.getComment()),
                     new Credentials(form.getIrmc_ip(), form.getIrmcLogin(), form.getIrmcPassword()),
                     new Credentials(form.getOs_ip(), form.getOsLogin(), form.getOsPassword()));
         } catch (GeneralServerException e) {
@@ -175,56 +144,4 @@ public class ServerController {
         }
         return "redirect:/servers";
     }
-
-    private boolean restoreDefaultPassword(Servers server) throws PasswordIsNotChangedException {
-        Users user = server.getUser();
-        user.removeHostname(server);
-        server.setUser(null);
-        Credentials os = credentialsAccess.findByIp(server.getOs_ip());
-        Credentials irmc = credentialsAccess.findByIp(server.getIrmc_ip());
-        OperatingSystem operatingSystem = WindowsNetUser.checkOS(server.getHost_name());
-
-        switch (operatingSystem) {
-
-            case WINDOWS:
-                try {
-                    WindowsNetUser.changeWindowsUserPassword(server.getHost_name(), os.getLogin(), os.getPassword(), DEFAULT_PASSWORD);
-
-                    serversAccess.save(server);
-                    usersAccess.save(user, true);
-                    os.setPassword(DEFAULT_PASSWORD);
-                    credentialsAccess.save(os);
-                    return true;
-                } catch (PasswordIsNotChangedException | GeneralServerException e) {
-                    LOGGER.debug(e.getMessage());
-                    throw new PasswordIsNotChangedException(e.getMessage());
-                }
-            case LINUX:
-                SSHConnector sshConnector = new SSHConnector(os.getIp(), DEFAULT_PORT, os.getLogin(), os.getPassword());
-                try {
-                    sshConnector.changePassword(DEFAULT_PASSWORD);
-                    serversAccess.save(server);
-                    usersAccess.save(user, true);
-                    os.setPassword(DEFAULT_PASSWORD);
-                    credentialsAccess.save(os);
-                    return true;
-                } catch (PasswordIsNotChangedException | GeneralServerException e) {
-                    LOGGER.debug(e.getMessage());
-                    return false;
-                }
-            case NON_AVAILABLE_PATH:
-                break;
-
-        }
-        return false;
-
-    }
-    private String passwordNotChanged(Model model, Exception e) {
-        LOGGER.debug(e.getMessage());
-        model.addAttribute("error", "Error while reserving server. Changes are not saved! "+e.getMessage());
-        LOGGER.info("Error while reserving server. Changes are not saved!");
-        return "redirect:/servers";
-    }
-
-
 }

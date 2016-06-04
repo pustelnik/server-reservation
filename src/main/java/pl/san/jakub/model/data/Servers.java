@@ -3,7 +3,7 @@ package pl.san.jakub.model.data;
 import javax.persistence.*;
 
 /**
- * Created by Jakub on 07.11.2015.
+ * @author  by Jakub on 07.11.2015.
  */
 
 @Entity
@@ -14,11 +14,11 @@ public class Servers {
     private @Column(nullable = false) String irmc_ip;
     @ManyToOne(fetch = FetchType.EAGER)
     private Users user;
+    private String model, rackPosition, lan, operatingSystem, comment;
 
     public Servers() {
 
     }
-
 
     public Servers(String host_name, String os_ip, String irmc_ip) {
         this.host_name = host_name;
@@ -26,6 +26,75 @@ public class Servers {
         this.irmc_ip = irmc_ip;
     }
 
+    public Servers(String host_name,
+                   String os_ip,
+                   String irmc_ip,
+                   String model,
+                   String rackPosition,
+                   String lan,
+                   String operatingSystem,
+                   String comment) {
+        this.host_name = host_name;
+        this.os_ip = os_ip;
+        this.irmc_ip = irmc_ip;
+        this.model = model;
+        this.rackPosition = rackPosition;
+        this.lan = lan;
+        this.operatingSystem = operatingSystem;
+        this.comment = comment;
+    }
+
+    public void setHost_name(String host_name) {
+        this.host_name = host_name;
+    }
+
+    public void setOs_ip(String os_ip) {
+        this.os_ip = os_ip;
+    }
+
+    public void setIrmc_ip(String irmc_ip) {
+        this.irmc_ip = irmc_ip;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getRackPosition() {
+        return rackPosition;
+    }
+
+    public void setRackPosition(String rackPosition) {
+        this.rackPosition = rackPosition;
+    }
+
+    public String getLan() {
+        return lan;
+    }
+
+    public void setLan(String lan) {
+        this.lan = lan;
+    }
+
+    public String getOperatingSystem() {
+        return operatingSystem;
+    }
+
+    public void setOperatingSystem(String operatingSystem) {
+        this.operatingSystem = operatingSystem;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
     public Users getUser() {
         return user;

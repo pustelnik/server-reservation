@@ -86,7 +86,7 @@
             background-color: #428bca;
         }
         .main {
-            margin-left: 20%;
+            width: 75%;
             margin-top: 75px;
         }
         @media (min-width: 768px) {
@@ -102,6 +102,12 @@
         #options {
             display: inline-flex;
         }
+
+        .option {
+            display: inline-block;
+            padding-right: 15px;
+        }
+
         .buttons-right {
             padding-right: 15px;
         }

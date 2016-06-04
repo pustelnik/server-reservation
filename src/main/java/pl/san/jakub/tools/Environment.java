@@ -56,8 +56,11 @@ public class Environment {
             LOGGER.info("File not found at path {}.",ClassLoader.getSystemResource("").getPath());
 
         }
-
         return properties.getProperty(propertyName);
+    }
+
+    public static boolean readBooleanProperty(String propertyName) {
+        return Boolean.getBoolean(readProperty(propertyName));
     }
 
     private static void readFile(Properties properties, String path) {

@@ -22,6 +22,8 @@ import pl.san.jakub.tools.WindowsNetUser;
 import pl.san.jakub.tools.WindowsNetUser.ConnectionStatus;
 import pl.san.jakub.tools.exceptions.GeneralServerException;
 import pl.san.jakub.tools.exceptions.ServerCreationException;
+import pl.san.jakub.tools.exceptions.UserAlreadyExistException;
+import pl.san.jakub.tools.exceptions.UserDontExistException;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -87,7 +89,15 @@ public class AdminController {
 
         try {
             usersAccess.save(users, true);
-        } catch (GeneralServerException e) {
+
+        } catch (UserAlreadyExistException e) {
+            LOGGER.debug(e.getMessage());
+            model.addAttribute("error", "User already exist.");
+        } catch (UserDontExistException e) {
+            LOGGER.debug(e.getMessage());
+            model.addAttribute("error", "User does not exist.");
+        }
+        catch (GeneralServerException e) {
             LOGGER.debug(e.getMessage());
             model.addAttribute("error", "Operation failed because DB error!");
             return "redirect:/users";
@@ -106,8 +116,8 @@ public class AdminController {
             model.addAttribute("error", "User is not removed!");
             return "redirect:/admin/users";
         }
-        usersAccess.delete(user.getUsername());
         authoritiesAccess.remove(user.getUsername());
+        usersAccess.delete(user.getUsername());
 
         model.addAttribute("msg", "Successfully removed user "+user.getUsername() + ".");
         return "redirect:/admin/users";
@@ -141,10 +151,10 @@ public class AdminController {
             Credentials os = credentialsAccess.findByIp(server.getOs_ip());
             Credentials irmc = credentialsAccess.findByIp(server.getIrmc_ip());
 
-            String irmcLogin = form.getIrmcLogin();
-            String irmcPassword = form.getIrmcPassword();
-            String osLogin = form.getOsLogin();
-            String osPassword = form.getOsPassword();
+            String irmcLogin = form.getIrmcLogin(), irmcPassword = form.getIrmcPassword(),
+                    osLogin = form.getOsLogin(), osPassword = form.getOsPassword(),
+                    serverModel = form.getModel(), rackPosition = form.getRackPosition(), lan = form.getLan(),
+                    operatingSystem = form.getOperatingSystem(), comment = form.getComment();
 
             if(isNotBlank(irmcLogin)) {
                 irmc.setLogin(irmcLogin);
@@ -158,9 +168,25 @@ public class AdminController {
             if(isNotBlank(osPassword)) {
                 os.setPassword(osPassword);
             }
+            if(isNotBlank(serverModel)) {
+                server.setModel(serverModel);
+            }
+            if(isNotBlank(rackPosition)) {
+                server.setRackPosition(rackPosition);
+            }
+            if(isNotBlank(lan)) {
+                server.setLan(lan);
+            }
+            if(isNotBlank(operatingSystem)) {
+                server.setOperatingSystem(operatingSystem);
+            }
+            if (isNotBlank(comment)) {
+                server.setComment(comment);
+            }
             try {
                 credentialsAccess.save(os);
                 credentialsAccess.save(irmc);
+                serversAccess.save(server);
             } catch (GeneralServerException e) {
                 LOGGER.debug(e.getMessage());
                 model.addAttribute("error", "Operation failed because DB error!");
@@ -204,6 +230,7 @@ public class AdminController {
             server.setUser(null);
             user.removeHostname(server);
             usersAccess.save(user, true);
+            // TODO add default password restore
         }
     }
 

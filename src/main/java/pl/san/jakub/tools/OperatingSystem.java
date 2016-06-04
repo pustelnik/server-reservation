@@ -7,6 +7,9 @@ public enum OperatingSystem {
 
     WINDOWS("Windows"),
     LINUX("Linux"),
+    ESXI("ESXi"),
+    HYPERV("HyperV"),
+    OTHER("Other"),
     NON_AVAILABLE_PATH("Can't find OS. Maybe machine is OFFLINE.");
 
     public String value;

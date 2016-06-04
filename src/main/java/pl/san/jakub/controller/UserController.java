@@ -1,8 +1,9 @@
 package pl.san.jakub.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @Controller
 public class UserController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     private UsersAccess usersAccess;
     private AuthoritiesAccess authoritiesAccess;
 
@@ -50,7 +52,8 @@ public class UserController {
             usersAccess.save(users, false);
             authoritiesAccess.save(new Authorities(users.getUsername(), "ROLE_USER"));
         } catch (GeneralServerException e) {
-            model.addAttribute("error", "Operation failed because DB error!");
+            LOGGER.error(e.getMessage());
+            model.addAttribute("error", "Operation failed because of DB error!");
             return "redirect:/profile/register";
         }
         return "redirect:/profile/" + users.getUsername();
